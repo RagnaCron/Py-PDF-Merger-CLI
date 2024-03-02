@@ -25,21 +25,56 @@
 
 
 from argparse import ArgumentParser
-from pypdf import PdfMerger
+from pypdf import PdfWriter
 
 
 def merge_pdfs(input_files, output_file):
-    merger = PdfMerger()
+    """
+    Merge PDFs.
+
+    :param input_files: List of input PDF files to be merged.
+    :param output_file: Output file to save the merged PDF.
+    :return: None
+
+    This method takes a list of input PDF files and merges them into a single PDF file specified by the output file path.
+    The input files are appended one by one using the `PdfWriter.append` method from the `PyPDF2` library, and then the
+    merged PDF is written to the output file using the `PdfWriter.write` method. Finally, the `PdfWriter` object is closed
+    using the `PdfWriter.close` method.
+
+    Example usage:
+    >>> input_files = ["file1.pdf", "file2.pdf", "file3.pdf"]
+    >>> output_file = "merged.pdf"
+    >>> merge_pdfs(input_files, output_file)
+
+    .. note::
+        This method requires the `PyPDF2` library to be installed.
+
+    .. warning::
+        The output file will be overwritten if it already exists.
+
+    .. seealso::
+        `PyPDF2 documentation <https://pythonhosted.org/PyPDF2/>`_
+    """
+    writer = PdfWriter()
     for file in input_files:
-        merger.append(file)
-    merger.write(output_file)
-    merger.close()
+        writer.append(file)
+    writer.write(output_file)
+    writer.close()
 
 
 def main():
+    """
+    Entry point of the program. It parses the command line arguments and calls the `merge_pdfs` function.
+
+    :return: None
+    """
     parser = ArgumentParser()
-    parser.add_argument('input_files', nargs='+', help='List of input PDF files, the order of the files is important')
-    parser.add_argument('output_file', help='Output PDF file')
+    parser.add_argument(
+        '-i',
+        '--input_files',
+        nargs='+',
+        help='List of input PDF files, the order of the files is important')
+    parser.add_argument('-o', '--output_file', help='Output PDF file', default='merged.pdf')
     args = parser.parse_args()
 
     merge_pdfs(args.input_files, args.output_file)
