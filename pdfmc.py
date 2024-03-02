@@ -38,7 +38,7 @@ def merge_pdfs(input_files, output_file):
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument('input_files', nargs='+', help='List of input PDF files')
+    parser.add_argument('input_files', nargs='+', help='List of input PDF files, the order of the files is important')
     parser.add_argument('output_file', help='Output PDF file')
     args = parser.parse_args()
 
