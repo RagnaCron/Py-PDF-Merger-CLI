@@ -37,23 +37,22 @@ def merge_pdfs(input_files, output_file):
     :return: None
 
     This method takes a list of input PDF files and merges them into a single PDF file specified by the output file path.
-    The input files are appended one by one using the `PdfWriter.append` method from the `PyPDF2` library, and then the
-    merged PDF is written to the output file using the `PdfWriter.write` method. Finally, the `PdfWriter` object is closed
-    using the `PdfWriter.close` method.
+    The input files are appended one by one using the `PdfWriter.append` method from the `pypdf` library, and then the
+    merged PDF is written to the output file using the `PdfWriter.write` method.
 
-    Example usage:
+    .. Example usage:
     >>> input_files = ["file1.pdf", "file2.pdf", "file3.pdf"]
     >>> output_file = "merged.pdf"
     >>> merge_pdfs(input_files, output_file)
 
     .. note::
-        This method requires the `PyPDF2` library to be installed.
+        This method requires the `pypdf` library to be installed.
 
     .. warning::
         The output file will be overwritten if it already exists.
 
     .. seealso::
-        `PyPDF2 documentation <https://pythonhosted.org/PyPDF2/>`_
+        `pypdf <https://pypi.org/project/pypdf/>`_
     """
     writer = PdfWriter()
     for file in input_files:
