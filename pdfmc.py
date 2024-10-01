@@ -23,9 +23,25 @@
 # SOFTWARE.
 #
 
+import os
 
 from argparse import ArgumentParser
 from pypdf import PdfWriter
+
+
+def get_pdf_files_in_folders(folders):
+    pdf_files_with_paths = []
+    for folder_path in folders:
+        try:
+            # List all files in the given folder
+            files = os.listdir(folder_path)
+            # Filter out the files with a .pdf extension and get their full paths
+            pdf_files = [os.path.join(folder_path, file) for file in files if file.lower().endswith('.pdf')]
+            pdf_files_with_paths.extend(pdf_files)
+        except Exception as e:
+            print(f"An error occurred with folder {folder_path}: {e}")
+    return pdf_files_with_paths
+
 
 
 def merge_pdfs(input_files, output_file):
@@ -56,7 +72,7 @@ def merge_pdfs(input_files, output_file):
     """
     writer = PdfWriter()
     for file in input_files:
-        writer.append(file)
+        writer.append( file)
     writer.write(output_file)
     writer.close()
 
@@ -70,13 +86,31 @@ def main():
     parser = ArgumentParser()
     parser.add_argument(
         '-i',
-        '--input_files',
+        '--files',
         nargs='+',
         help='List of input PDF files, the order of the files is important')
+    parser.add_argument(
+        '-f',
+        '--folders',
+        nargs='+',
+        help='List of input Folders with PDF files, the order of the folders and the files in them is important')
     parser.add_argument('-o', '--output_file', help='Output PDF file', default='merged.pdf')
     args = parser.parse_args()
 
-    merge_pdfs(args.input_files, args.output_file)
+    files = []
+
+    if args.files:
+        files = files + args.files
+
+    if args.folders:
+        pdf_files = get_pdf_files_in_folders(args.folders)
+        files = files + pdf_files
+
+    print("PDF files to merge:")
+    for pdf in files:
+        print(pdf)
+
+    merge_pdfs(files, args.output_file)
 
 
 if __name__ == '__main__':
