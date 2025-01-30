@@ -22,26 +22,49 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-
+import logging
 import os
 
 from argparse import ArgumentParser
 from pypdf import PdfWriter
 
-
-def get_pdf_files_in_folders(folders):
+def get_pdf_files_in_folders(folders, recursive=False):
     pdf_files_with_paths = []
     for folder_path in folders:
         try:
-            # List all files in the given folder
-            files = os.listdir(folder_path)
-            # Filter out the files with a .pdf extension and get their full paths
-            pdf_files = [os.path.join(folder_path, file) for file in files if file.lower().endswith('.pdf')]
-            pdf_files_with_paths.extend(pdf_files)
+            # Choose appropriate directory walker based on recursive flag
+            file_walker = os.walk(folder_path) if recursive else [(folder_path, None, os.listdir(folder_path))]
+            for root, _, files in file_walker:
+                pdf_files = [os.path.join(root, file) for file in files if file.lower().endswith('.pdf')]
+                pdf_files_with_paths.extend(pdf_files)
         except Exception as e:
-            print(f"An error occurred with folder {folder_path}: {e}")
+            logging.error(f"Error processing folder {folder_path}: {e}")
     return pdf_files_with_paths
 
+def validate_pdf_files(file_paths):
+    valid_files = []
+    for file_path in file_paths:
+        if not os.path.exists(file_path):
+            logging.warning(f"File not found: {file_path}")
+            continue
+        if not file_path.lower().endswith(".pdf"):
+            logging.warning(f"Not a PDF file: {file_path}")
+            continue
+        valid_files.append(file_path)
+    return valid_files
+
+# def get_pdf_files_in_folders(folders):
+#     pdf_files_with_paths = []
+#     for folder_path in folders:
+#         try:
+#             # List all files in the given folder
+#             files = os.listdir(folder_path)
+#             # Filter out the files with a .pdf extension and get their full paths
+#             pdf_files = [os.path.join(folder_path, file) for file in files if file.lower().endswith('.pdf')]
+#             pdf_files_with_paths.extend(pdf_files)
+#         except Exception as e:
+#             print(f"An error occurred with folder {folder_path}: {e}")
+#     return pdf_files_with_paths
 
 
 def merge_pdfs(input_files, output_file):
@@ -72,7 +95,7 @@ def merge_pdfs(input_files, output_file):
     """
     writer = PdfWriter()
     for file in input_files:
-        writer.append( file)
+        writer.append(file)
     writer.write(output_file)
     writer.close()
 
@@ -95,16 +118,27 @@ def main():
         nargs='+',
         help='List of input Folders with PDF files, the order of the folders and the files in them is important')
     parser.add_argument('-o', '--output_file', help='Output PDF file', default='merged.pdf')
+
+    parser.add_argument('--dry-run', action='store_true', help='Show files to be merged without merging them')
+
+    parser.add_argument('--recursive', action='store_true', help='Recursively scan folders for PDFs')
+
     args = parser.parse_args()
 
     files = []
 
     if args.files:
-        files = files + args.files
+        files = files + validate_pdf_files(args.files)
 
     if args.folders:
-        pdf_files = get_pdf_files_in_folders(args.folders)
+        pdf_files = get_pdf_files_in_folders(args.folders, recursive=args.recursive)
         files = files + pdf_files
+
+    if args.dry_run:
+        logging.info("Dry run mode. Files to be merged:")
+        for file in files:
+            print(file)
+        return
 
     print("PDF files to merge:")
     for pdf in files:
