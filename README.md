@@ -4,5 +4,5 @@ A simple CLI Tool written in Python to merge X PDFs in the order which was given
 
 ## Build the executable
 ```
-pyinstaller --onefile main.py
+pyinstaller --onefile pdfmc.py
 ```

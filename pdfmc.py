@@ -24,6 +24,7 @@
 #
 import logging
 import os
+from tqdm import tqdm
 
 from argparse import ArgumentParser
 from pypdf import PdfWriter
@@ -83,8 +84,11 @@ def merge_pdfs(input_files, output_file):
         `pypdf <https://pypi.org/project/pypdf/>`_
     """
     writer = PdfWriter()
-    for file in input_files:
-        writer.append(file)
+    for file in tqdm(input_files, desc="Merging PDFs"):
+        try:
+            writer.append(file)
+        except Exception as e:
+            logging.error(f"Error processing file {file}: {e}")
     writer.write(output_file)
     writer.close()
 
@@ -101,18 +105,21 @@ def main():
         '--files',
         nargs='+',
         help='List of input PDF files, the order of the files is important')
+
     parser.add_argument(
         '-f',
         '--folders',
         nargs='+',
         help='List of input Folders with PDF files, the order of the folders and the files in them is important')
+
     parser.add_argument('-o', '--output_file', help='Output PDF file', default='merged.pdf')
 
     parser.add_argument('--dry-run', action='store_true', help='Show files to be merged without merging them')
 
     parser.add_argument('--recursive', action='store_true', help='Recursively scan folders for PDFs')
 
-    parser.add_argument('--version', action='version', version='%(prog)s 1.0')
+    parser.add_argument('--version', action='version', version='%(prog)s No version info available')
+    parser.add_argument('--copyright', action='version', version='%(prog)s Copyright (c) 2024-2025 Manuel Werder')
 
     args = parser.parse_args()
 
@@ -130,10 +137,6 @@ def main():
         for file in files:
             print(file)
         return
-
-    print("PDF files to merge:")
-    for pdf in files:
-        print(pdf)
 
     merge_pdfs(files, args.output_file)
 
