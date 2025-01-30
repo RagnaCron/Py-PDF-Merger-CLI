@@ -123,6 +123,8 @@ def main():
 
     parser.add_argument('--recursive', action='store_true', help='Recursively scan folders for PDFs')
 
+    parser.add_argument('--version', action='version', version='%(prog)s 1.0')
+
     args = parser.parse_args()
 
     files = []
