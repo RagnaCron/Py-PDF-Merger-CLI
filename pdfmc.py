@@ -28,6 +28,7 @@ import os
 from argparse import ArgumentParser
 from pypdf import PdfWriter
 
+
 def get_pdf_files_in_folders(folders, recursive=False):
     pdf_files_with_paths = []
     for folder_path in folders:
@@ -41,6 +42,7 @@ def get_pdf_files_in_folders(folders, recursive=False):
             logging.error(f"Error processing folder {folder_path}: {e}")
     return pdf_files_with_paths
 
+
 def validate_pdf_files(file_paths):
     valid_files = []
     for file_path in file_paths:
@@ -52,19 +54,6 @@ def validate_pdf_files(file_paths):
             continue
         valid_files.append(file_path)
     return valid_files
-
-# def get_pdf_files_in_folders(folders):
-#     pdf_files_with_paths = []
-#     for folder_path in folders:
-#         try:
-#             # List all files in the given folder
-#             files = os.listdir(folder_path)
-#             # Filter out the files with a .pdf extension and get their full paths
-#             pdf_files = [os.path.join(folder_path, file) for file in files if file.lower().endswith('.pdf')]
-#             pdf_files_with_paths.extend(pdf_files)
-#         except Exception as e:
-#             print(f"An error occurred with folder {folder_path}: {e}")
-#     return pdf_files_with_paths
 
 
 def merge_pdfs(input_files, output_file):
