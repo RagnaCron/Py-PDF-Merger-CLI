@@ -119,7 +119,7 @@ def main():
     parser.add_argument('--recursive', action='store_true', help='Recursively scan folders for PDFs')
 
     parser.add_argument('--version', action='version', version='%(prog)s No version info available')
-    parser.add_argument('--copyright', action='version', version='%(prog)s Copyright (c) 2024-2025 Manuel Werder')
+    parser.add_argument('--copyright', action='copyright', copyright='%(prog)s Copyright (c) 2024-2025 Manuel Werder')
 
     args = parser.parse_args()
 
