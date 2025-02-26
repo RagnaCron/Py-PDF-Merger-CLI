@@ -1,5 +1,5 @@
 echo off
 
-pyinstaller --onefile pdfmc.py
+pyinstaller --clean --onefile pdfmc.py
 
 echo on

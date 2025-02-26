@@ -27,7 +27,7 @@ import os
 from tqdm import tqdm
 
 from argparse import ArgumentParser
-from pypdf import PdfWriter
+from pypdf import PdfWriter, PdfReader
 
 
 def get_pdf_files_in_folders(folders, recursive=False):
@@ -58,37 +58,17 @@ def validate_pdf_files(file_paths):
 
 
 def merge_pdfs(input_files, output_file):
-    """
-    Merge PDFs.
-
-    :param input_files: List of input PDF files to be merged.
-    :param output_file: Output file to save the merged PDF.
-    :return: None
-
-    This method takes a list of input PDF files and merges them into a single PDF file specified by the output file path.
-    The input files are appended one by one using the `PdfWriter.append` method from the `pypdf` library, and then the
-    merged PDF is written to the output file using the `PdfWriter.write` method.
-
-    .. Example usage:
-    >>> input_files = ["file1.pdf", "file2.pdf", "file3.pdf"]
-    >>> output_file = "merged.pdf"
-    >>> merge_pdfs(input_files, output_file)
-
-    .. note::
-        This method requires the `pypdf` library to be installed.
-
-    .. warning::
-        The output file will be overwritten if it already exists.
-
-    .. seealso::
-        `pypdf <https://pypi.org/project/pypdf/>`_
-    """
     writer = PdfWriter()
     for file in tqdm(input_files, desc="Merging PDFs"):
         try:
-            writer.append(file)
+            w = PdfWriter(file)
+            for page in w.pages:
+                page.compress_content_streams(level=9)
+                writer.add_page(page)
         except Exception as e:
             logging.error(f"Error processing file {file}: {e}")
+    writer.metadata = {}
+    writer.compress_identical_objects()
     writer.write(output_file)
     writer.close()
 
